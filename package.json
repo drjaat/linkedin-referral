@@ -1,0 +1,15 @@
+{
+  "name": "linkedin-playwright-automation",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node scripts/linkedin-outreach.mjs",
+    "dry-run": "DRY_RUN=true node scripts/linkedin-outreach.mjs"
+  },
+  "dependencies": {
+    "dotenv": "^16.5.0",
+    "openai": "^4.104.0",
+    "playwright": "^1.54.2"
+  }
+}
