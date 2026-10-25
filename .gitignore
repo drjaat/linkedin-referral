@@ -1,3 +1,7 @@
 node_modules/
 .pw-state/
 .env
+.linkedin-run-state.json
+extension.pem
+extension.crx
+dist/

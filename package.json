@@ -5,7 +5,9 @@
   "type": "module",
   "scripts": {
     "start": "node scripts/linkedin-outreach.mjs",
-    "dry-run": "DRY_RUN=true node scripts/linkedin-outreach.mjs"
+    "dry-run": "DRY_RUN=true node scripts/linkedin-outreach.mjs",
+    "test:extension": "node --test tests/extension/*.test.js",
+    "test:extension-browser": "node tests/extension/panel-smoke.mjs"
   },
   "dependencies": {
     "dotenv": "^16.5.0",

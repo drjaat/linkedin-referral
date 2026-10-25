@@ -24,6 +24,7 @@ const cfg = {
   noteTemplate: process.env.NOTE_TEMPLATE || "",
   sentThresholdPerJob: Number(process.env.SENT_THRESHOLD_PER_JOB || 5),
   sentThresholdPerCompany: Number(process.env.SENT_THRESHOLD_PER_COMPANY || 5),
+  minCompanyMembers: Number(process.env.MIN_COMPANY_MEMBERS || 100),
   experienceFilterEnabled:
     String(process.env.EXPERIENCE_FILTER_ENABLED || "true").toLowerCase() === "true",
   preferredMinYears: Number(process.env.PREFERRED_MIN_YEARS || 5),
@@ -70,6 +71,7 @@ const runStatePath = path.resolve(".linkedin-run-state.json");
 const runState = loadRunState(runStatePath);
 const gptClient = createGptClient(cfg);
 let gptDisabledForRun = false;
+const companyMemberEligibilityCache = new Map();
 
 const context = await chromium.launchPersistentContext(stateDir, {
   headless: false,
@@ -132,6 +134,26 @@ for (const job of jobs) {
       `[COMPANY] Skipping ${companySlug}; already sent ${companyAlreadySent}/${cfg.sentThresholdPerCompany}`
     );
     continue;
+  }
+
+  const companyCacheKey = companySlug || extractCompanyRootUrl(companyUrl) || companyUrl;
+  let memberCheck = companyMemberEligibilityCache.get(companyCacheKey);
+  if (!memberCheck) {
+    memberCheck = await checkCompanyMemberEligibility(page, companyUrl, cfg);
+    companyMemberEligibilityCache.set(companyCacheKey, memberCheck);
+  } else {
+    console.log(
+      `[COMPANY] Reusing cached member check for ${companyCacheKey}: ${memberCheck.reason}`
+    );
+  }
+  if (!memberCheck.ok) {
+    console.log(`[COMPANY] Skipping company by size filter: ${memberCheck.reason}`);
+    continue;
+  }
+  if (Number.isFinite(memberCheck.memberCount)) {
+    console.log(
+      `[COMPANY] Eligible by size: ${memberCheck.memberCount} members (min ${cfg.minCompanyMembers})`
+    );
   }
 
   const peopleUrl = buildCompanyPeopleUrl(companyUrl, "hiring");
@@ -1203,6 +1225,82 @@ function extractCompanyNameFromPeopleUrl(url = "") {
   const m = String(url).match(/linkedin\.com\/company\/([^/?#]+)/i);
   if (!m?.[1]) return "";
   return m[1].replace(/-/g, " ");
+}
+
+async function checkCompanyMemberEligibility(page, companyUrl, cfg) {
+  const companyRootUrl = extractCompanyRootUrl(companyUrl);
+  if (!companyRootUrl) {
+    return { ok: false, reason: "company URL could not be parsed", memberCount: null };
+  }
+
+  const peopleOverviewUrl = `${companyRootUrl}/people/`;
+  console.log(`[COMPANY] Checking member count on: ${peopleOverviewUrl}`);
+
+  await page.goto(peopleOverviewUrl, { waitUntil: "domcontentloaded" });
+  await pauseRandom(cfg.actionDelayMinMs, cfg.actionDelayMaxMs, "company people overview load");
+
+  const bodyText = await page.locator("body").innerText().catch(() => "");
+  const memberCount = extractCompanyMemberCount(bodyText);
+  if (!Number.isFinite(memberCount)) {
+    return {
+      ok: false,
+      reason: "unable to detect company member count",
+      memberCount: null,
+    };
+  }
+
+  if (memberCount < cfg.minCompanyMembers) {
+    return {
+      ok: false,
+      reason: `member count ${memberCount} is below minimum ${cfg.minCompanyMembers}`,
+      memberCount,
+    };
+  }
+
+  return {
+    ok: true,
+    reason: `member count ${memberCount} meets minimum ${cfg.minCompanyMembers}`,
+    memberCount,
+  };
+}
+
+function extractCompanyMemberCount(text = "") {
+  const raw = String(text || "").toLowerCase();
+  const patterns = [
+    /([\d,.]+\s*[kmb]?)\s*(?:associated\s+)?members\b/g,
+    /([\d,.]+\s*[kmb]?)\s*(?:on\s+linkedin\s+)?members\b/g,
+    /([\d,.]+\s*[kmb]?)\s*employees\b/g,
+  ];
+
+  let best = null;
+  for (const pattern of patterns) {
+    pattern.lastIndex = 0;
+    let match;
+    while ((match = pattern.exec(raw)) !== null) {
+      const parsed = parseCompactNumber(match[1]);
+      if (!Number.isFinite(parsed) || parsed <= 0) continue;
+      if (!best || parsed > best) {
+        best = parsed;
+      }
+    }
+  }
+
+  return best;
+}
+
+function parseCompactNumber(input = "") {
+  const compact = String(input || "").trim().toLowerCase().replace(/,/g, "");
+  if (!compact) return NaN;
+  const match = compact.match(/^(\d+(?:\.\d+)?)\s*([kmb])?$/i);
+  if (!match) return NaN;
+
+  const base = Number(match[1]);
+  if (!Number.isFinite(base)) return NaN;
+
+  const suffix = (match[2] || "").toLowerCase();
+  const multipliers = { k: 1_000, m: 1_000_000, b: 1_000_000_000 };
+  const multiplier = suffix ? multipliers[suffix] || 1 : 1;
+  return Math.round(base * multiplier);
 }
 
 function makeContactKey(profileUrl = "", name = "", companySlug = "") {

@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Job Outreach</title>
+  <link rel="stylesheet" href="panel.css">
+</head>
+<body>
+  <header>
+    <span class="eyebrow">LINKEDIN JOB OUTREACH</span>
+    <h1>Job outreach</h1>
+    <p>Open a LinkedIn job or post, then review people to contact.</p>
+    <p class="disclaimer">Independent tool. Not affiliated with LinkedIn.</p>
+  </header>
+  <main>
+    <section class="card">
+      <h2>Your details</h2>
+      <label>Your name<input id="candidateName" autocomplete="name" placeholder="Alex Morgan"></label>
+      <label>Resume link (jobs only)<input id="resumeUrl" type="url" placeholder="https://..."></label>
+      <label>Minimum company size
+        <select id="minCompanyMembers">
+          <option value="0">Any size</option>
+          <option value="100">100+ members</option>
+          <option value="1000">1,000+ members</option>
+          <option value="5000">5,000+ members</option>
+        </select>
+      </label>
+      <p class="hint">Applied when LinkedIn shows a member count.</p>
+    </section>
+    <details class="card">
+      <summary>More options</summary>
+      <label>Signature<input id="signature" placeholder="Uses your first name"></label>
+      <label>Role name for {JobTitle} (optional)<input id="roleTitle" placeholder="Only used if your note contains {JobTitle}"></label>
+      <p class="hint">The default note uses a fixed role name. The job link points to the exact posting.</p>
+      <label>Connection note<textarea id="noteTemplate" rows="5"></textarea></label>
+      <p class="hint">Available tokens: {FirstName}, {JobTitle}, {ResumeUrl}, {JobUrl}, {Signature}, {CandidateName}. Maximum 300 characters.</p>
+      <label>Post engagement note<textarea id="postNoteTemplate" rows="5"></textarea></label>
+      <p class="hint">Available tokens: {FirstName}, {Engagement}, {PostUrl}, {Signature}, {CandidateName}. The job filters below apply only to jobs.</p>
+      <label>Include job title keywords<input id="includeKeywords" placeholder="frontend,react"></label>
+      <label>Exclude job title keywords<input id="excludeKeywords"></label>
+      <label>Exclude companies<input id="excludeCompanies" placeholder="company name or slug"></label>
+      <div class="grid">
+        <label>Requests per job or post<input id="maxContacts" type="number" min="1" max="20"></label>
+        <label>Per company cap<input id="maxPerCompany" type="number" min="1" max="20"></label>
+      </div>
+      <label class="check"><input id="filterExperience" type="checkbox"> Filter by required experience</label>
+      <div class="grid">
+        <label>Min. years<input id="minYears" type="number" min="0"></label>
+        <label>Max. years<input id="maxYears" type="number" min="0"></label>
+        <label>Your years<input id="candidateYears" type="number" min="0"></label>
+        <label>Internship years<input id="internshipYears" type="number" min="0"></label>
+        <label>Internship weight<input id="internshipWeight" type="number" min="0" max="1" step="0.1"></label>
+      </div>
+    </details>
+    <section class="actions">
+      <button id="preview">Find contacts</button>
+      <button id="send" class="danger" disabled>Send selected</button>
+    </section>
+    <p class="hint">Review each recipient's profile and full note, then tick the people you want to contact. Interns and contacts without a readable role or profile URL are skipped. A post preview only includes people visible in the loaded comments and reactions.</p>
+    <section class="card" aria-live="polite">
+      <h2>Recipients and notes</h2>
+      <p id="status">Ready. Open a LinkedIn job detail page or a specific post.</p>
+      <div id="results"></div>
+      <details class="progress"><summary>Activity</summary><ol id="log"></ol></details>
+    </section>
+    <section class="card data-controls">
+      <h2>Your data</h2>
+      <p class="hint">Settings and sent history are stored in this browser.</p>
+      <a href="privacy.html" target="_blank" rel="noopener">Privacy policy</a>
+      <button id="clearHistory" type="button" class="secondary">Clear sent history</button>
+    </section>
+  </main>
+  <script type="module" src="panel.js"></script>
+</body>
+</html>

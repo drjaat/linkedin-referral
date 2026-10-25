@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Envelope with outgoing arrow">
+  <rect x="4" y="4" width="120" height="120" rx="27" fill="#0b2842"/>
+  <rect x="23" y="37" width="68" height="53" rx="8" fill="none" stroke="#ffffff" stroke-width="8"/>
+  <path d="M27 43 57 66 87 43" fill="none" stroke="#ffffff" stroke-linecap="round" stroke-linejoin="round" stroke-width="8"/>
+  <circle cx="91" cy="87" r="25" fill="#91dbce"/>
+  <path d="M79 88h25m-10-10 10 10-10 10" fill="none" stroke="#0b2842" stroke-linecap="round" stroke-linejoin="round" stroke-width="6"/>
+</svg>
