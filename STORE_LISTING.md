@@ -28,6 +28,6 @@ Productivity; English
 
 ## Still needed for the store listing
 
-- Public HTTPS URL for the privacy policy in `extension/privacy.html`.
+- Privacy policy URL: https://drjaat.github.io/linkedin-referral/privacy.html.
 - A real support contact.
 - Upload `dist/store-screenshot-1280x800.jpg`, which shows the extension review screen with sample contacts.

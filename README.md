@@ -17,7 +17,7 @@ Open a specific LinkedIn post URL (`/posts/...` or `/feed/update/...`) and click
 
 The extension uses template notes. The Playwright script's optional Azure OpenAI personalization is not included because an API key in an unpacked client extension would be exposed.
 
-The in-extension [privacy policy](extension/privacy.html) describes the local data. Before Chrome Web Store submission, host this policy at a public HTTPS URL, add that URL and a real support contact to the store listing, and check LinkedIn's current rules on automated invitations. Store reviewers can reject extensions that send messages without recipient and content confirmation; this extension now requires that review, but store approval and LinkedIn acceptance are not guaranteed.
+The in-extension [privacy policy](extension/privacy.html) describes the local data. Its public copy for the Chrome Web Store is at https://drjaat.github.io/linkedin-referral/privacy.html. Add that URL and a real support contact to the store listing, and check LinkedIn's current rules on automated invitations. Store reviewers can reject extensions that send messages without recipient and content confirmation; this extension now requires that review, but store approval and LinkedIn acceptance are not guaranteed.
 
 Use the [publishing checklist](PUBLISHING.md) for live LinkedIn checks and store submission steps.
 
